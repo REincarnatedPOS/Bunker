@@ -3,92 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бункер — Панель Ведущего</title>
+    <title>BUNKER OS — Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .stat-hidden { background-color: #374151; color: transparent; cursor: pointer; transition: all 0.3s; }
-        .stat-hidden:hover { background-color: #4b5563; }
-        .revealed { background-color: transparent; color: white; cursor: default; }
-        .kicked { opacity: 0.3; filter: grayscale(1); }
+        .stat-hidden { background-color: #1f2937; color: transparent; cursor: pointer; transition: 0.2s; border: 1px solid #374151; }
+        .stat-hidden:hover { background-color: #374151; }
+        .revealed { background-color: transparent; color: #e5e7eb; cursor: default; border: 1px transparent; }
+        .kicked { background-color: #450a0a !important; opacity: 0.6; text-decoration: line-through; }
+        table { border-collapse: separate; border-spacing: 0 4px; }
+        th { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; color: #9ca3af; }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-4 font-sans">
+<body class="bg-black text-gray-200 min-h-screen p-6 font-mono">
 
-    <div id="setup-screen" class="max-w-2xl mx-auto mt-10">
-        <h1 class="text-4xl font-bold mb-6 text-center text-yellow-500">Создание игры</h1>
-        <div class="bg-gray-800 p-6 rounded-xl shadow-xl">
-            <label class="block mb-2">Введите имена игроков (через запятую):</label>
-            <textarea id="player-names" class="w-full bg-gray-700 p-3 rounded mb-4 h-32 outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Тимур, Камиль, Леха, Рома..."></textarea>
-            <button onclick="startGame()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 rounded-lg transition">ГЕНЕРИРОВАТЬ ИГРУ</button>
-        </div>
+    <div id="setup-screen" class="max-w-xl mx-auto mt-20 bg-gray-900 p-8 rounded-2 border border-gray-800 shadow-2xl">
+        <h1 class="text-3xl font-bold mb-6 text-green-500 tracking-tighter">INITIALIZING_BUNKER_PROTOCOLS...</h1>
+        <textarea id="player-names" class="w-full bg-black border border-gray-700 p-4 rounded mb-6 h-40 focus:border-green-500 outline-none text-green-400" placeholder="Введите имена через запятую..."></textarea>
+        <button onclick="startGame()" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-4 transition uppercase tracking-widest">Запустить симуляцию</button>
     </div>
 
     <div id="game-screen" class="hidden">
-        <div class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
-            <h1 class="text-3xl font-bold text-yellow-500">Бункер: Выжившие</h1>
-            <button onclick="resetGame()" class="text-xs bg-red-900 hover:bg-red-700 px-3 py-1 rounded">Сбросить всё</button>
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-green-500">REPORTS: SURVIVAL_STATUS</h1>
+            <button onclick="resetGame()" class="text-xs border border-red-900 text-red-900 hover:bg-red-900 hover:text-white px-2 py-1 transition">TERMINATE_ALL</button>
         </div>
         
-        <div id="players-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-gray-900">
+                        <th class="p-3">Имя</th>
+                        <th class="p-3">Возраст</th>
+                        <th class="p-3">Пол</th>
+                        <th class="p-3">Раса</th>
+                        <th class="p-3">Ориентация</th>
+                        <th class="p-3">Childfree</th>
+                        <th class="p-3">Профессия</th>
+                        <th class="p-3">Здоровье</th>
+                        <th class="p-3">Багаж</th>
+                        <th class="p-3">Действие</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        // Твои кастомные характеристики
         const DATA = {
-            professions: ["Программист (C++)", "Повар молекулярной кухни", "Астрофизик", "Укротитель тигров", "Биоинженер", "Экономист", "Шахматист"],
-            health: ["Идеальное", "Аллергия на арахис", "Дальтонизм", "Спортивное телосложение", "Слабое зрение", "Бессонница"],
-            hobbies: ["Игра в шахматы", "Написание стихов", "Выживание в лесу", "Стриминг Minecraft", "Игра на пианино", "Дзюдо"],
-            traits: ["Паникер", "Лидерские качества", "Перфекционист", "Черный юмор", "Аскет", "Транжира"],
-            luggage: ["Набор отмычек", "Гитара", "Запас консервов", "Аптечка", "Ноутбук на Ubuntu", "Старый револьвер"],
-            specials: ["Заставить игрока перетянуть профессию", "Узнать скрытую черту", "Право вето", "Иммунитет на 1 ход"]
+            profs: ["Инженер-ядерщик", "Мясник", "ТикТокер", "Философ", "Агроном", "Священник", "Киберспортсмен"],
+            health: ["Абсолютное", "Диабет 2 типа", "Шизофрения", "Клаустрофобия", "Отсутствие почки", "Лунатизм"],
+            luggage: ["Дробовик (1 патрон)", "Ящик тушенки", "Плюшевый мишка", "Счетчик Гейгера", "Противогаз"],
+            orientations: ["Гетеро", "Гомо", "Би", "Пансексуал", "Асексуал", "Сапиосексуал", "Объектофил", "Квадросексуал"],
+            races: ["Оборотень", "Вампир", "Кошко-человек"]
         };
 
-        let players = JSON.parse(localStorage.getItem('bunker_players')) || [];
+        let players = JSON.parse(localStorage.getItem('bunker_db')) || [];
 
-        function shuffle(array) {
-            let arr = [...array];
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        function generateCharacter(name) {
+            // Шанс 0.1% на Особый случай
+            if (Math.random() < 0.001) {
+                return {
+                    name, isAlive: true,
+                    stats: [
+                        { v: getRandomInt(1000, 3000), r: false }, // Возраст
+                        { v: "Уберменш", r: false },              // Пол
+                        { v: "Существо", r: false },              // Раса
+                        { v: "Восходящая", r: false },            // ОOrient
+                        { v: "—", r: true },                     // Childfree
+                        { v: "Создатель миров", r: false },       // Проф
+                        { v: "Бессмертие", r: false },            // Здоровье
+                        { v: "Сингулярность", r: false }          // Багаж
+                    ]
+                };
             }
-            return arr;
+
+            // Обычная генерация
+            const isHuman = Math.random() > 0.05;
+            const race = isHuman ? "Человек" : DATA.races[Math.floor(Math.random() * DATA.races.length)];
+            
+            return {
+                name, isAlive: true,
+                stats: [
+                    { v: getRandomInt(5, 120), r: false }, 
+                    { v: Math.random() > 0.5 ? "Мужской" : "Женский", r: false },
+                    { v: race, r: false },
+                    { v: DATA.orientations[Math.floor(Math.random() * DATA.orientations.length)], r: false },
+                    { v: Math.random() > 0.5 ? "Да" : "Нет", r: false },
+                    { v: DATA.profs[Math.floor(Math.random() * DATA.profs.length)], r: false },
+                    { v: DATA.health[Math.floor(Math.random() * DATA.health.length)], r: false },
+                    { v: DATA.luggage[Math.floor(Math.random() * DATA.luggage.length)], r: false }
+                ]
+            };
         }
 
         function startGame() {
             const input = document.getElementById('player-names').value;
-            if (!input) return alert("Введите имена!");
-            
+            if (!input) return;
             const names = input.split(',').map(n => n.trim()).filter(n => n);
-            
-            // Перемешиваем списки для уникальности
-            const shuf = {
-                p: shuffle(DATA.professions),
-                h: shuffle(DATA.health),
-                hb: shuffle(DATA.hobbies),
-                t: shuffle(DATA.traits),
-                l: shuffle(DATA.luggage),
-                s: shuffle(DATA.specials)
-            };
+            players = names.map(n => generateCharacter(n));
+            saveAndRender();
+        }
 
-            players = names.map(name => ({
-                name,
-                isAlive: true,
-                stats: [
-                    { label: "Профессия", value: shuf.p.pop() || "Безработный", revealed: false },
-                    { label: "Здоровье", value: shuf.h.pop() || "Хроническое", revealed: false },
-                    { label: "Хобби", value: shuf.hb.pop() || "Нет", revealed: false },
-                    { label: "Черта", value: shuf.t.pop() || "Обычный", revealed: false },
-                    { label: "Багаж", value: shuf.l.pop() || "Пусто", revealed: false },
-                    { label: "Спец. карта", value: shuf.s.pop() || "Нет", revealed: false }
-                ]
-            }));
+        function toggleStat(pIdx, sIdx) {
+            players[pIdx].stats[sIdx].r = !players[pIdx].stats[sIdx].r;
+            saveAndRender();
+        }
 
+        function editStat(e, pIdx, sIdx) {
+            e.preventDefault();
+            const val = prompt("Изменить значение:", players[pIdx].stats[sIdx].v);
+            if (val !== null) { players[pIdx].stats[sIdx].v = val; saveAndRender(); }
+        }
+
+        function toggleKick(pIdx) {
+            players[pIdx].isAlive = !players[pIdx].isAlive;
             saveAndRender();
         }
 
         function saveAndRender() {
-            localStorage.setItem('bunker_players', JSON.stringify(players));
+            localStorage.setItem('bunker_db', JSON.stringify(players));
             render();
         }
 
@@ -98,69 +135,41 @@
                 document.getElementById('game-screen').classList.add('hidden');
                 return;
             }
-
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
 
-            const grid = document.getElementById('players-grid');
-            grid.innerHTML = '';
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
 
-            players.forEach((player, pIdx) => {
-                const card = document.createElement('div');
-                card.className = `bg-gray-800 p-5 rounded-xl border-2 ${player.isAlive ? 'border-gray-700' : 'border-red-900 kicked'}`;
+            players.forEach((p, pIdx) => {
+                const tr = document.createElement('tr');
+                tr.className = `border-b border-gray-800 hover:bg-gray-900 transition ${p.isAlive ? '' : 'kicked'}`;
                 
-                let statsHtml = player.stats.map((s, sIdx) => `
-                    <div class="mb-2">
-                        <span class="text-xs text-gray-400 uppercase block">${s.label}</span>
-                        <div onclick="toggleStat(${pIdx}, ${sIdx})" 
-                             oncontextmenu="editStat(event, ${pIdx}, ${sIdx})"
-                             class="p-2 rounded mt-1 text-sm border border-gray-600 ${s.revealed ? 'revealed' : 'stat-hidden'}">
-                            ${s.value}
-                        </div>
-                    </div>
-                `).join('');
+                let html = `<td class="p-3 font-bold text-white border-l-4 ${p.isAlive ? 'border-green-500' : 'border-red-900'}">${p.name}</td>`;
+                
+                p.stats.forEach((s, sIdx) => {
+                    html += `
+                        <td class="p-3">
+                            <div onclick="toggleStat(${pIdx}, ${sIdx})" 
+                                 oncontextmenu="editStat(event, ${pIdx}, ${sIdx})"
+                                 class="p-2 rounded text-xs text-center min-w-[80px] ${s.r ? 'revealed' : 'stat-hidden'}">
+                                ${s.v}
+                            </div>
+                        </td>`;
+                });
 
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <h2 class="text-2xl font-bold ${player.isAlive ? 'text-white' : 'text-red-500'}">${player.name}</h2>
-                        <button onclick="toggleKick(${pIdx})" class="text-xs px-2 py-1 rounded ${player.isAlive ? 'bg-red-700' : 'bg-green-700'}">
-                            ${player.isAlive ? 'ВЫГНАТЬ' : 'ВЕРНУТЬ'}
-                        </button>
-                    </div>
-                    ${statsHtml}
-                `;
-                grid.appendChild(card);
+                html += `<td class="p-3 text-right">
+                    <button onclick="toggleKick(${pIdx})" class="bg-red-950 text-red-500 px-3 py-1 rounded text-[10px] hover:bg-red-800">
+                        ${p.isAlive ? 'ELIMINATE' : 'RESTORE'}
+                    </button>
+                </td>`;
+                
+                tr.innerHTML = html;
+                tbody.appendChild(tr);
             });
         }
 
-        function toggleStat(pIdx, sIdx) {
-            players[pIdx].stats[sIdx].revealed = !players[pIdx].stats[sIdx].revealed;
-            saveAndRender();
-        }
-
-        function editStat(e, pIdx, sIdx) {
-            e.preventDefault();
-            const newVal = prompt("Изменить характеристику:", players[pIdx].stats[sIdx].value);
-            if (newVal !== null) {
-                players[pIdx].stats[sIdx].value = newVal;
-                saveAndRender();
-            }
-        }
-
-        function toggleKick(pIdx) {
-            players[pIdx].isAlive = !players[pIdx].isAlive;
-            saveAndRender();
-        }
-
-        function resetGame() {
-            if (confirm("Точно сбросить всю игру?")) {
-                localStorage.removeItem('bunker_players');
-                players = [];
-                render();
-            }
-        }
-
-        // Инициализация при загрузке
+        function resetGame() { if(confirm("Удалить все данные?")) { players = []; saveAndRender(); } }
         render();
     </script>
 </body>
