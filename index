@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бункер — Панель Ведущего</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .stat-hidden { background-color: #374151; color: transparent; cursor: pointer; transition: all 0.3s; }
+        .stat-hidden:hover { background-color: #4b5563; }
+        .revealed { background-color: transparent; color: white; cursor: default; }
+        .kicked { opacity: 0.3; filter: grayscale(1); }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-4 font-sans">
+
+    <div id="setup-screen" class="max-w-2xl mx-auto mt-10">
+        <h1 class="text-4xl font-bold mb-6 text-center text-yellow-500">Создание игры</h1>
+        <div class="bg-gray-800 p-6 rounded-xl shadow-xl">
+            <label class="block mb-2">Введите имена игроков (через запятую):</label>
+            <textarea id="player-names" class="w-full bg-gray-700 p-3 rounded mb-4 h-32 outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Тимур, Камиль, Леха, Рома..."></textarea>
+            <button onclick="startGame()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 rounded-lg transition">ГЕНЕРИРОВАТЬ ИГРУ</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
+            <h1 class="text-3xl font-bold text-yellow-500">Бункер: Выжившие</h1>
+            <button onclick="resetGame()" class="text-xs bg-red-900 hover:bg-red-700 px-3 py-1 rounded">Сбросить всё</button>
+        </div>
+        
+        <div id="players-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+    </div>
+
+    <script>
+        // Твои кастомные характеристики
+        const DATA = {
+            professions: ["Программист (C++)", "Повар молекулярной кухни", "Астрофизик", "Укротитель тигров", "Биоинженер", "Экономист", "Шахматист"],
+            health: ["Идеальное", "Аллергия на арахис", "Дальтонизм", "Спортивное телосложение", "Слабое зрение", "Бессонница"],
+            hobbies: ["Игра в шахматы", "Написание стихов", "Выживание в лесу", "Стриминг Minecraft", "Игра на пианино", "Дзюдо"],
+            traits: ["Паникер", "Лидерские качества", "Перфекционист", "Черный юмор", "Аскет", "Транжира"],
+            luggage: ["Набор отмычек", "Гитара", "Запас консервов", "Аптечка", "Ноутбук на Ubuntu", "Старый револьвер"],
+            specials: ["Заставить игрока перетянуть профессию", "Узнать скрытую черту", "Право вето", "Иммунитет на 1 ход"]
+        };
+
+        let players = JSON.parse(localStorage.getItem('bunker_players')) || [];
+
+        function shuffle(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startGame() {
+            const input = document.getElementById('player-names').value;
+            if (!input) return alert("Введите имена!");
+            
+            const names = input.split(',').map(n => n.trim()).filter(n => n);
+            
+            // Перемешиваем списки для уникальности
+            const shuf = {
+                p: shuffle(DATA.professions),
+                h: shuffle(DATA.health),
+                hb: shuffle(DATA.hobbies),
+                t: shuffle(DATA.traits),
+                l: shuffle(DATA.luggage),
+                s: shuffle(DATA.specials)
+            };
+
+            players = names.map(name => ({
+                name,
+                isAlive: true,
+                stats: [
+                    { label: "Профессия", value: shuf.p.pop() || "Безработный", revealed: false },
+                    { label: "Здоровье", value: shuf.h.pop() || "Хроническое", revealed: false },
+                    { label: "Хобби", value: shuf.hb.pop() || "Нет", revealed: false },
+                    { label: "Черта", value: shuf.t.pop() || "Обычный", revealed: false },
+                    { label: "Багаж", value: shuf.l.pop() || "Пусто", revealed: false },
+                    { label: "Спец. карта", value: shuf.s.pop() || "Нет", revealed: false }
+                ]
+            }));
+
+            saveAndRender();
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('bunker_players', JSON.stringify(players));
+            render();
+        }
+
+        function render() {
+            if (players.length === 0) {
+                document.getElementById('setup-screen').classList.remove('hidden');
+                document.getElementById('game-screen').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            const grid = document.getElementById('players-grid');
+            grid.innerHTML = '';
+
+            players.forEach((player, pIdx) => {
+                const card = document.createElement('div');
+                card.className = `bg-gray-800 p-5 rounded-xl border-2 ${player.isAlive ? 'border-gray-700' : 'border-red-900 kicked'}`;
+                
+                let statsHtml = player.stats.map((s, sIdx) => `
+                    <div class="mb-2">
+                        <span class="text-xs text-gray-400 uppercase block">${s.label}</span>
+                        <div onclick="toggleStat(${pIdx}, ${sIdx})" 
+                             oncontextmenu="editStat(event, ${pIdx}, ${sIdx})"
+                             class="p-2 rounded mt-1 text-sm border border-gray-600 ${s.revealed ? 'revealed' : 'stat-hidden'}">
+                            ${s.value}
+                        </div>
+                    </div>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <h2 class="text-2xl font-bold ${player.isAlive ? 'text-white' : 'text-red-500'}">${player.name}</h2>
+                        <button onclick="toggleKick(${pIdx})" class="text-xs px-2 py-1 rounded ${player.isAlive ? 'bg-red-700' : 'bg-green-700'}">
+                            ${player.isAlive ? 'ВЫГНАТЬ' : 'ВЕРНУТЬ'}
+                        </button>
+                    </div>
+                    ${statsHtml}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleStat(pIdx, sIdx) {
+            players[pIdx].stats[sIdx].revealed = !players[pIdx].stats[sIdx].revealed;
+            saveAndRender();
+        }
+
+        function editStat(e, pIdx, sIdx) {
+            e.preventDefault();
+            const newVal = prompt("Изменить характеристику:", players[pIdx].stats[sIdx].value);
+            if (newVal !== null) {
+                players[pIdx].stats[sIdx].value = newVal;
+                saveAndRender();
+            }
+        }
+
+        function toggleKick(pIdx) {
+            players[pIdx].isAlive = !players[pIdx].isAlive;
+            saveAndRender();
+        }
+
+        function resetGame() {
+            if (confirm("Точно сбросить всю игру?")) {
+                localStorage.removeItem('bunker_players');
+                players = [];
+                render();
+            }
+        }
+
+        // Инициализация при загрузке
+        render();
+    </script>
+</body>
+</html>
