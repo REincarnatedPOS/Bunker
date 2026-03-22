@@ -3,90 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUNKER_OS v5.0 | NIS EDITION</title>
+    <title>BUNKER_OS v5.1 | NIS FIXED</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
-        body { font-family: 'Fira Code', monospace; background-color: #050505; color: #d1d5db; overflow-x: hidden; }
-        .screen { display: none; min-height: 100vh; padding: 2rem; }
+        body { font-family: 'Fira Code', monospace; background-color: #050505; color: #d1d5db; }
+        .screen { display: none; min-height: 100vh; padding: 1.5rem; }
         .screen.active { display: block; }
-        
-        .stat-box { background-color: #111827; border: 1px solid #1f2937; cursor: pointer; transition: 0.2s; padding: 4px 8px; border-radius: 4px; margin: 2px 0; font-size: 0.7rem; display: flex; align-items: center; justify-content: space-between; }
+        .stat-box { background-color: #111827; border: 1px solid #1f2937; cursor: pointer; transition: 0.2s; padding: 4px 8px; border-radius: 4px; margin: 2px 0; font-size: 0.65rem; display: flex; align-items: center; justify-content: space-between; min-width: 80px;}
         .stat-hidden { color: transparent !important; background-color: #0f172a; border-style: dashed; }
         .revealed { color: #10b981; border-color: #064e3b; background-color: #022c22; }
         .kicked { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
-        
         .tooltip { position: relative; display: inline-block; margin-left: 4px; color: #4b5563; }
         .tooltip .tooltiptext {
-            visibility: hidden; width: 220px; background-color: #1f2937; color: #fff; text-align: center;
+            visibility: hidden; width: 180px; background-color: #1f2937; color: #fff; text-align: center;
             border-radius: 6px; padding: 8px; position: absolute; z-index: 100; bottom: 125%; left: 50%;
-            margin-left: -110px; opacity: 0; transition: opacity 0.3s; font-size: 0.65rem; border: 1px solid #10b981;
+            margin-left: -90px; opacity: 0; transition: opacity 0.3s; font-size: 0.6rem; border: 1px solid #10b981;
         }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
-        
         .apocalypse-card { border: 1px solid #991b1b; background: linear-gradient(to bottom, #111827, #000); padding: 2rem; border-radius: 1rem; box-shadow: 0 0 30px rgba(153, 27, 27, 0.2); }
-        th { text-transform: uppercase; font-size: 0.6rem; color: #4b5563; padding: 10px 5px; border-bottom: 2px solid #111827; }
+        th { text-transform: uppercase; font-size: 0.55rem; color: #4b5563; padding: 10px 5px; border-bottom: 2px solid #111827; }
     </style>
 </head>
 <body>
 
-    <div id="setup-screen" class="screen active max-w-3xl mx-auto mt-10">
-        <div class="bg-gray-900/50 p-10 border border-green-900/30 rounded-xl">
-            <h1 class="text-3xl font-bold mb-2 text-green-500 tracking-tighter">BUNKER_OS // INITIAL_BOOT</h1>
-            <p class="text-gray-500 text-xs mb-8 italic">Version 5.0. Enhanced randomization active.</p>
-            <label class="block mb-2 text-sm text-gray-400">Введите имена выживших через запятую:</label>
-            <textarea id="player-names" class="w-full bg-black border border-gray-800 p-4 rounded mb-6 h-48 focus:border-green-500 outline-none text-green-400 text-sm" placeholder="Тимур, Камиль, Рома..."></textarea>
-            <button onclick="prepareGame()" class="w-full bg-green-950 text-green-400 border border-green-500 font-bold py-4 hover:bg-green-500 hover:text-black transition uppercase tracking-widest">Создать симуляцию</button>
+    <div id="setup-screen" class="screen active max-w-2xl mx-auto mt-10">
+        <div class="bg-gray-900/50 p-8 border border-green-900/30 rounded-xl shadow-2xl">
+            <h1 class="text-2xl font-bold mb-2 text-green-500 tracking-tighter">BUNKER_OS // NIS_EDITION</h1>
+            <p class="text-gray-500 text-[10px] mb-6 italic uppercase">Core: Stable v5.1 | Auto-Recovery Enabled</p>
+            
+            <label class="block mb-2 text-xs text-gray-400 uppercase tracking-widest">Список выживших (через запятую):</label>
+            <textarea id="player-names" class="w-full bg-black border border-gray-800 p-4 rounded mb-6 h-40 focus:border-green-500 outline-none text-green-400 text-sm placeholder-gray-700" placeholder="Тимур, Камиль, Рома, Леха, Куат..."></textarea>
+            
+            <button onclick="prepareGame()" class="w-full bg-green-950 text-green-400 border border-green-500 font-bold py-4 hover:bg-green-500 hover:text-black transition uppercase text-sm tracking-widest">Сгенерировать Мир</button>
         </div>
     </div>
 
-    <div id="apocalypse-screen" class="screen max-w-4xl mx-auto mt-10">
+    <div id="apocalypse-screen" class="screen max-w-3xl mx-auto mt-10">
         <div class="apocalypse-card">
-            <h2 class="text-red-600 text-xs font-bold tracking-[0.3em] mb-2 uppercase">Warning: World Collapse Detected</h2>
-            <h1 id="apo-title" class="text-4xl font-black text-white mb-6 uppercase tracking-tighter">Ядерный Холокост</h1>
+            <h2 class="text-red-600 text-[10px] font-bold tracking-[0.4em] mb-2 uppercase">System Message: World Collapsed</h2>
+            <h1 id="apo-title" class="text-3xl font-black text-white mb-4 uppercase tracking-tighter">---</h1>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
                 <div>
-                    <h3 class="text-green-500 font-bold mb-2 underline">Описание ситуации:</h3>
+                    <h3 class="text-green-500 font-bold mb-2 uppercase tracking-tighter underline">Ситуация снаружи:</h3>
                     <p id="apo-desc" class="text-gray-400 leading-relaxed"></p>
                 </div>
                 <div class="bg-black/50 p-4 border border-gray-800 rounded">
-                    <h3 class="text-yellow-500 font-bold mb-2">Характеристики Бункера:</h3>
-                    <ul id="bunker-stats" class="space-y-2 text-xs list-disc pl-4 text-gray-300"></ul>
+                    <h3 class="text-yellow-500 font-bold mb-2 uppercase tracking-tighter">Состояние Бункера:</h3>
+                    <ul id="bunker-stats" class="space-y-1 text-[11px] list-disc pl-4 text-gray-300"></ul>
                 </div>
             </div>
             
-            <button onclick="showGame()" class="mt-10 w-full py-4 bg-white text-black font-black hover:bg-gray-200 transition uppercase">Войти в бункер</button>
+            <button onclick="showGame()" class="mt-8 w-full py-4 bg-white text-black font-black hover:bg-gray-200 transition uppercase tracking-widest text-sm">Открыть шлюз</button>
         </div>
     </div>
 
     <div id="game-screen" class="screen w-full">
         <div class="flex justify-between items-center mb-6 border-b border-green-900/30 pb-4">
             <div>
-                <h1 class="text-xl font-bold text-green-500 tracking-widest">SHELTER_DASHBOARD_v5.0</h1>
-                <p id="game-info" class="text-[10px] text-gray-600 uppercase"></p>
+                <h1 class="text-lg font-bold text-green-500 tracking-widest">SHELTER_TERMINAL_v5.1</h1>
+                <p id="game-info" class="text-[9px] text-gray-600 uppercase italic"></p>
             </div>
-            <div class="flex gap-4">
-                <button onclick="toggleAllStats()" id="btn-reveal-all" class="text-[10px] border border-blue-500 text-blue-500 px-3 py-1 rounded hover:bg-blue-500 hover:text-black transition">ОТКРЫТЬ ВСЁ</button>
-                <button onclick="resetGame()" class="text-[10px] border border-red-900 text-red-900 px-3 py-1 rounded hover:bg-red-900 hover:text-white transition">RESET</button>
+            <div class="flex gap-2">
+                <button onclick="toggleAllStats()" id="btn-reveal-all" class="text-[9px] border border-blue-500 text-blue-500 px-3 py-1 rounded hover:bg-blue-500 hover:text-black">ОТКРЫТЬ ВСЁ</button>
+                <button onclick="resetGame()" class="text-[9px] border border-red-900 text-red-900 px-3 py-1 rounded hover:bg-red-900 hover:text-white">REBOOT</button>
             </div>
         </div>
         
         <div class="overflow-x-auto">
-            <table class="w-full text-left">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr>
+                    <tr class="bg-gray-900/30">
                         <th>Subject</th>
-                        <th>Bio (В/П/Р)</th>
-                        <th>Личность (О/Ч)</th>
-                        <th>Тело</th>
+                        <th>Био (В/П/Р)</th>
+                        <th>Личность</th>
+                        <th>Телосложение</th>
                         <th>Профессия</th>
                         <th>Здоровье</th>
                         <th>Хобби</th>
                         <th>Черта</th>
-                        <th>Багаж (М/Б)</th>
-                        <th>Спец. Возможности</th>
-                        <th>Статус</th>
+                        <th>Багаж</th>
+                        <th>Спец.Карты</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
@@ -95,16 +94,18 @@
     </div>
 
     <script>
+        // БАЗА ДАННЫХ (БЕЗ ИЗМЕНЕНИЙ)
         const DATA = {
             profs: {"Программист": "Может добавить в малый багаж ноутбук на линукс","Мясник": "Может добавить в багаж недельный запас мяса","Философ": "Добавляет в багаж книгу","Агроном": "Может вырастить еду","Имам": "Излечить паранойю/фобию или собрать дань","Кардиохирург": "Лечит болезни сердца","Хирург": "Понижает тяжесть заболевания","Нейрохирург": "Лечит болезни головы","Инфекционист": "Лечит инфекции","Электрик": "Добавить электронику в багаж","Полицейский": "Арест на 1 ход (минус голос)","Блогер": "Снимает депрессию","Психотерапевт": "Лечит псих. недуги","Механик": "Добавить инструменты в багаж","Повар": "Добавить кух. утварь в багаж","Фармацевт": "Добавить лекарство","Учитель": "Дать рандомный навык","Архитектор": "Добавить комнату в бункер","Химик": "Сделать соседа «солевым»","Актер": "Сменить профессию на рандомную","Тренер": "Сменить телосложение игрока","Вор": "Украсть багаж","Алкоголик": "Сделать соседа алкоголиком","Диктатор": "Поменять голос в голосовании","Камиль": "Он просто существует"},
             health: {"Идеально здоров": "Человек полностью здоров","Сталинский самовар": "Отсутствие 4 конечностей","Отсутствие ноги": "Нет ноги","Отсутствие руки": "Нет руки","Слепота": "Слепой","Дальнозоркость": "Далеко хорошо, близко плохо","Близорукость": "Далеко плохо, близко хорошо","Диабет 2 типа": "Нужен инсулин","Шизофрения": "Галлюны","Солевой": "Закинулся и откинулся","Аллергия на все": "Апчхи","Лунатизм": "Гуляет в ночи","Кашель": "Подозрительно","Лоботомия": "Дырка в башке","Гепатит А": "Без описания","Сколиоз": "Кривая спина","Паранойя": "Все следят","Порок сердца": "Тяжелее физ нагрузки","Бессонница": "Тупо я","Тревожность": "Тупо я 2","Астма": "Вдох, выдох","Эпилепсия": "*Flashbang","Депрессия": "Грусть","Алкоголизм": "Ну да","Грипп": "Заразно","Аритмия": "Сердце стучит неровно","Высокое давление": "Риск инсульта","Не различает право и лево": "Топографический кретинизм","Плохая память": "Что я тут делаю?","СДВГ": "Смотри, белка!","ОКР": "Надо помыть руки 40 раз","Высокая сенсорность": "Всё слишком громко","Патологический врун": "Не верьте ему"},
             hobbies: ["Шахматы", "Покер", "Рисование", "Писательство", "Фотография", "Видеомонтаж", "Радиолюбительство", "Выживание", "Охота", "Рыбалка", "Кулинария", "Садоводство", "Астрономия", "Медитация", "Йога", "Бег", "Плавание", "Боевые искусства", "Стрельба", "Сбор грибов", "Скалолазание", "Велоспорт", "Ремонт техники", "Электроника", "Химические эксперименты", "Настолки"],
             traits: ["Мизантроп", "Перфекционист", "Лидер", "Манипулятор", "Параноик", "Нарцисс", "Гипероптимист", "Пессимист", "Конфликтный", "Миротворец", "Контрол-фрик", "Импульсивный", "Тормознутый", "Болтливый", "Молчаливый", "Токсичный", "Гиперэмпат", "Эгоцентричный", "Ленивый гений", "Паникёр", "Фаталист", "Идеалист", "Реалист", "Самоуверенный", "Неуверенный", "Обидчивый", "Злопамятный", "Доверчивый", "Подозрительный", "Упрямый", "Внушаемый", "Скептик", "Конспиролог", "Шутник не к месту", "Газлайтер"],
             small: ["Нож", "Мультитул", "Фонарик", "Зажигалка", "Дилдо", "Компас", "Аптечка", "Бинт", "Шприц", "Пистолет Айтоле", "Патроны", "Перцовый баллончик", "Верёвка (10 м)", "Изолента", "Плоскогубцы", "Отвёртка", "Радио", "Пауэрбанк Камиля", "Телефон", "Флешка", "Карта", "Часы", "Очки НВ", "Рация", "Бутылка воды", "Консерва", "Мерси Айжан апай", "Таблетки", "Противогаз", "Ободок с Ушками", "Cash Flow", "Цитатник Куата", "Ноутбук на Linux", "Чипсы", "Сушняк", "Парик ЕС’а", "Обувь Тенгри", "Ключи Кайреке", "Закладка", "Курсовая Адильжана", "Халат Алтынбека", "Сигареты Стояна", "Фото Куата 3х4"],
-            large: ["Генератор", "Топливо", "Инструменты", "Меднабор", "Мини-теплица", "Собачья еда", "Бочка воды", "Школьный фильтр", "Солнечные панели", "Оружейный ящик", "Палатка", "Печка из каба ЕС’а", "Аккумулятор", "Холодильник-рюкзак", "Радиостанция", "Надувная кукла", "Труп", "Вархаммер (все книги)", "Талант волейболиста", "Цитаты Карлыгаш апай", "Ящик телефонов 12 класса", "Набор АСМР", "Гардероб Арны", "Толстовки QR", "Нотации Марии Авельяровны", "Пофигизм копатыча", "БД Темирлана", "Запись тишины"],
+            large: ["Генератор", "Топливо", "Инструменты", "Меднабор", "Мини-теплица", "Собачья еда", "Бочка воды", "Школьный фильтр", "Солнечные панели", "Оружейный ящик", "Палатка", "Печка из каба ЕС’а", "Аккумулятор", "Холодильник-рюкзак", "Радиостанция", "Надувная кукла", "Труп", "Вархаммер", "Талант волейболиста", "Цитаты Карлыгаш апай", "Ящик телефонов 12 класса", "Набор АСМР", "Гардероб Арны", "Толстовки QR", "Нотации Марии Авельяровны", "Пофигизм копатыча", "БД Темирлана", "Запись тишины"],
             specials: ["Смена профессии", "Иммунитет на ходу", "Право вето", "Узнать черту", "Воскрешение", "Удвоить еду", "Сменить здоровье соседа", "Украсть багаж", "Заблокировать голос"],
             orientations: ["Гетеро", "Гомо", "Би", "Пансексуал", "Асексуал", "Сапиосексуал", "Объектофил"],
-            races: ["Человек", "Человек", "Человек", "Оборотень", "Вампир", "Кошко-человек"], // Увеличил шанс человека
+            races: ["Человек", "Человек", "Человек", "Оборотень", "Вампир", "Кошко-человек"],
+            body_types: ["хрупкое", "обычное", "стройное", "анорексия", "пухлость", "ожирение 1 ст.", "ожирение 2 ст.", "ожирение 3 ст.", "еле живой"],
             severity: ["Критическая", "Тяжелая", "Средняя", "Малая"]
         };
 
@@ -127,7 +128,6 @@
             return a;
         }
 
-        // Инициализация колод (вызывается один раз при старте)
         function initDecks() {
             decks = {
                 profs: shuffle(Object.keys(DATA.profs)),
@@ -142,42 +142,46 @@
         }
 
         function getFromDeck(key) {
-            if (decks[key].length === 0) return "Закончилось"; // Если игроков больше чем карт
+            if (!decks[key] || decks[key].length === 0) return "---"; 
             return decks[key].pop();
         }
 
         function prepareGame() {
-            const input = document.getElementById('player-names').value;
-            if (!input) return;
-            
-            initDecks();
-            const names = input.split(',').map(n => n.trim()).filter(n => n);
-            players = names.map(n => generateCharacter(n));
-            
-            // Генерируем апокалипсис
-            currentApo = rnd(APO_SCENARIOS);
-            document.getElementById('apo-title').innerText = currentApo.title;
-            document.getElementById('apo-desc').innerText = currentApo.desc;
-            const bStats = document.getElementById('bunker-stats');
-            bStats.innerHTML = currentApo.stats.map(s => `<li>${s}</li>`).join('');
+            try {
+                const input = document.getElementById('player-names').value;
+                if (!input || input.trim() === "") { alert("Введите имена!"); return; }
+                
+                initDecks();
+                const names = input.split(',').map(n => n.trim()).filter(n => n);
+                players = names.map(n => generateCharacter(n));
+                
+                currentApo = APO_SCENARIOS[Math.floor(Math.random() * APO_SCENARIOS.length)];
+                document.getElementById('apo-title').innerText = currentApo.title;
+                document.getElementById('apo-desc').innerText = currentApo.desc;
+                document.getElementById('bunker-stats').innerHTML = currentApo.stats.map(s => `<li>${s}</li>`).join('');
 
-            switchScreen('apocalypse-screen');
+                switchScreen('apocalypse-screen');
+                console.log("Simulation initialized successfully.");
+            } catch (err) {
+                console.error("Critical Init Error:", err);
+                alert("Ошибка при создании игры. Проверьте консоль.");
+            }
         }
 
         function generateCharacter(name) {
-            // Шанс 0.1% на Уберменша остается чистым рандомом вне колод
+            // Шанс 0.1% на Уберменша
             if (Math.random() < 0.001) {
                 return {
                     name, isAlive: true,
                     stats: [
                         { label: "Био", items: [3000, "Уберменш", "Существо"], tips: ["Древний", "Бог", "Вне видов"], rev: [false, false, false] },
-                        { label: "Личность", items: ["Восходящая", "—"], tips: ["Дух", "Не применимо"], rev: [false, true] },
+                        { label: "Личность", items: ["Восходящая", "—"], tips: ["Дух", "Childfree"], rev: [false, true] },
                         { label: "Тело", items: ["2.0м, Идеальная форма"], tips: ["Эталон"], rev: [false] },
-                        { label: "Проф", items: ["Создатель миров"], tips: ["Admin"], rev: [false] },
+                        { label: "Проф", items: ["Создатель миров"], tips: ["Admin Access"], rev: [false] },
                         { label: "Здоровье", items: ["Бессмертие"], tips: ["Infinite HP"], rev: [false] },
                         { label: "Хобби", items: ["Наблюдение"], tips: ["Eye"], rev: [false] },
                         { label: "Черта", items: ["Вне морали"], tips: ["Chaos"], rev: [false] },
-                        { label: "Багаж", items: ["Сингулярность (М)", "Мультик (Б)"], tips: ["Small", "Big"], rev: [false, false] },
+                        { label: "Багаж", items: ["Сингулярность (М)", "Мультик (Б)"], tips: ["S", "L"], rev: [false, false] },
                         { label: "Спец", items: ["Reset", "Erase"], tips: ["X", "Y"], rev: [false, false] }
                     ]
                 };
@@ -185,19 +189,18 @@
 
             const pKey = getFromDeck('profs');
             const hKey = getFromDeck('health');
-            const hSev = hKey === "Идеально здоров" ? "" : rnd(DATA.severity) + " ст: ";
-            
-            const race = rnd(DATA.races);
-            const bodyType = Math.random() < 0.03 ? rnd(["Рама 2 на 2", "Форма Идеального круга"]) : (Math.random()*(2.5-1.2)+1.2).toFixed(2) + "м, " + rnd(DATA.body_types || ["обычное", "хрупкое", "атлет"]);
+            const hSev = hKey === "Идеально здоров" ? "" : (DATA.severity[Math.floor(Math.random()*DATA.severity.length)]) + " ст: ";
+            const race = DATA.races[Math.floor(Math.random() * DATA.races.length)];
+            const bodyType = Math.random() < 0.03 ? (Math.random() > 0.5 ? "Рама 2 на 2" : "Форма Идеального круга") : (Math.random()*(2.5-1.2)+1.2).toFixed(2) + "м, " + (DATA.body_types[Math.floor(Math.random()*DATA.body_types.length)]);
 
             return {
                 name, isAlive: true,
                 stats: [
-                    { label: "Био", items: [Math.floor(Math.random()*110)+5, rnd(["Мужской", "Женский"]), race], tips: ["Возраст", "Пол", "Раса"], rev: [false, false, false] },
-                    { label: "Личность", items: [getFromDeck('orientations'), Math.random() > 0.5 ? "Childfree" : "Хочет детей"], tips: ["Ориентация", "Дети"], rev: [false, false] },
+                    { label: "Био", items: [Math.floor(Math.random()*110)+5, (Math.random()>0.5?"Мужской":"Женский"), race], tips: ["Возраст", "Пол", "Раса"], rev: [false, false, false] },
+                    { label: "Личность", items: [getFromDeck('orientations'), (Math.random()>0.5?"Childfree":"Хочет детей")], tips: ["Ориентация", "Дети"], rev: [false, false] },
                     { label: "Тело", items: [bodyType], tips: ["Параметры"], rev: [false] },
-                    { label: "Проф", items: [pKey], tips: [DATA.profs[pKey]], rev: [false] },
-                    { label: "Здоровье", items: [hSev + hKey], tips: [DATA.health[hKey]], rev: [false] },
+                    { label: "Проф", items: [pKey], tips: [DATA.profs[pKey] || ""], rev: [false] },
+                    { label: "Здоровье", items: [hSev + hKey], tips: [DATA.health[hKey] || ""], rev: [false] },
                     { label: "Хобби", items: [getFromDeck('hobbies')], tips: ["Увлечение"], rev: [false] },
                     { label: "Черта", items: [getFromDeck('traits')], tips: ["Психотип"], rev: [false] },
                     { label: "Багаж", items: [getFromDeck('small') + " (М)", getFromDeck('large') + " (Б)"], tips: ["Малый", "Большой"], rev: [false, false] },
@@ -209,23 +212,24 @@
         function showGame() {
             switchScreen('game-screen');
             document.getElementById('game-info').innerText = `Scen: ${currentApo.title} | Subjects: ${players.length}`;
-            saveAndRender();
+            save();
         }
 
         function switchScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            const target = document.getElementById(id);
+            if (target) target.classList.add('active');
         }
 
         function toggleStat(pIdx, sIdx, iIdx) {
             players[pIdx].stats[sIdx].rev[iIdx] = !players[pIdx].stats[sIdx].rev[iIdx];
-            saveAndRender();
+            save();
         }
 
         function editStat(e, pIdx, sIdx, iIdx) {
             e.preventDefault();
-            const val = prompt("Edit:", players[pIdx].stats[sIdx].items[iIdx]);
-            if (val !== null) { players[pIdx].stats[sIdx].items[iIdx] = val; saveAndRender(); }
+            const val = prompt("Изменить:", players[pIdx].stats[sIdx].items[iIdx]);
+            if (val !== null) { players[pIdx].stats[sIdx].items[iIdx] = val; save(); }
         }
 
         function toggleAllStats() {
@@ -233,12 +237,14 @@
             const state = btn.innerText === "ОТКРЫТЬ ВСЁ";
             players.forEach(p => p.stats.forEach(s => s.rev.fill(state)));
             btn.innerText = state ? "СКРЫТЬ ВСЁ" : "ОТКРЫТЬ ВСЁ";
-            saveAndRender();
+            save();
         }
 
-        function saveAndRender() {
-            localStorage.setItem('bunker_v5', JSON.stringify({players, currentApo}));
-            renderTable();
+        function save() {
+            try {
+                localStorage.setItem('bunker_v5_1', JSON.stringify({players, currentApo}));
+                renderTable();
+            } catch(e) { console.error("Save failed", e); }
         }
 
         function renderTable() {
@@ -248,7 +254,7 @@
                 const tr = document.createElement('tr');
                 if (!p.isAlive) tr.className = 'kicked';
                 
-                let html = `<td class="p-2 font-bold text-green-500 text-xs">${p.name}</td>`;
+                let html = `<td class="p-2 font-bold text-green-500 text-[11px] border-r border-gray-800">${p.name}</td>`;
                 p.stats.forEach((s, sIdx) => {
                     let subHtml = s.items.map((item, iIdx) => `
                         <div onclick="toggleStat(${pIdx}, ${sIdx}, ${iIdx})" 
@@ -260,21 +266,36 @@
                     `).join('');
                     html += `<td class="p-1">${subHtml}</td>`;
                 });
-                html += `<td class="p-2 text-center"><button onclick="players[${pIdx}].isAlive = !players[${pIdx}].isAlive; saveAndRender();" class="text-[8px] opacity-50 hover:opacity-100 border p-1 border-gray-700 uppercase">${p.isAlive ? 'X' : 'Rec'}</button></td>`;
+                html += `<td class="p-2 text-center"><button onclick="players[${pIdx}].isAlive = !players[${pIdx}].isAlive; save();" class="text-[9px] border border-gray-700 px-1 text-gray-500">${p.isAlive ? 'X' : 'R'}</button></td>`;
                 tr.innerHTML = html;
                 tbody.appendChild(tr);
             });
         }
 
-        function resetGame() { if(confirm("RESET ALL?")) { players=[]; localStorage.clear(); location.reload(); } }
-        
-        // Автозагрузка
+        function resetGame() { 
+            if(confirm("Сбросить игру?")) { 
+                localStorage.removeItem('bunker_v5_1'); 
+                location.reload(); 
+            } 
+        }
+
         window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem('bunker_v5'));
-            if (saved && saved.players.length > 0) {
-                players = saved.players;
-                currentApo = saved.currentApo;
-                showGame();
+            try {
+                const raw = localStorage.getItem('bunker_v5_1');
+                if (raw) {
+                    const saved = JSON.parse(raw);
+                    // Проверяем структуру (защита от v4)
+                    if (saved && saved.players && saved.players[0] && saved.players[0].stats[0].label) {
+                        players = saved.players;
+                        currentApo = saved.currentApo;
+                        showGame();
+                    } else {
+                        localStorage.removeItem('bunker_v5_1');
+                    }
+                }
+            } catch (e) {
+                console.error("Auto-load failed. Clearing storage.");
+                localStorage.clear();
             }
         };
     </script>
